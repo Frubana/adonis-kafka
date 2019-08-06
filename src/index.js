@@ -27,7 +27,7 @@ class KafkaConsumer {
       'group.id': groupId,
       'enable.auto.commit': autoCommit,
       'metadata.broker.list': address,
-      offset_commit_cb: this._onCommit
+      offset_commit_cb: this._onCommit.bind(this)
       // rebalance_cb: this.rebalance
     }
 

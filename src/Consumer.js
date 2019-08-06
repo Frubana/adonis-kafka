@@ -43,7 +43,7 @@ class Consumer {
   }
 
   onData (data) {
-    const result = data.value.toString()
+    const result = JSON.parse(data.value.toString())
 
     const events = this.events[data.topic] || []
 
@@ -99,7 +99,7 @@ class Consumer {
     this.topics.push(topic)
 
     const events = this.events[topic] || []
-    events.push(callback)
+    events.push(callbackFunction)
     this.events[topic] = events
 
     if (this.consumer.isConnected()) {
