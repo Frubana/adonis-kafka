@@ -1,0 +1,6 @@
+{
+  "standard": {
+    "ignore": ["examples"],
+    "globals": ["use"]
+  }
+}

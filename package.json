@@ -1,0 +1,32 @@
+{
+  "name": "@frubana/adonis-kafka",
+  "version": "0.0.1",
+  "description": "Kafka addon for AdonisJs",
+  "main": "src/index.js",
+  "git": "git@github.com:Frubana/adonis-kafka.git",
+  "scripts": {
+    "lint": "standard src/** providers/** --fix",
+    "pretest": "npm run lint",
+    "test": "./node_modules/.bin/japa"
+  },
+  "private": false,
+  "keywords": [
+    "adonisjs",
+    "adonis-framework",
+    "kafka"
+  ],
+  "author": "@frubana",
+  "license": "",
+  "dependencies": {
+    "node-rdkafka": "2.7.0"
+  },
+  "devDependencies": {
+    "@adonisjs/ace": "^4.0.8",
+    "@adonisjs/fold": "^4.0.8",
+    "@adonisjs/framework": "^4.0.31",
+    "@adonisjs/sink": "^1.0.16",
+    "japa": "^1.0.6",
+    "japa-cli": "^1.0.1",
+    "standard": "^10.0.3"
+  }
+}
