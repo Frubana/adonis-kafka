@@ -125,7 +125,7 @@ class Consumer {
     const controller = new Module()
 
     if (typeof controller[func] === 'function') {
-      return controller[func]
+      return controller[func].bind(controller)
     }
 
     return null
