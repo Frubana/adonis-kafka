@@ -1,6 +1,6 @@
 {
   "name": "@frubana/adonis-kafka",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Kafka addon for AdonisJs",
   "main": "src/index.js",
   "git": "git@github.com:Frubana/adonis-kafka.git",
@@ -18,7 +18,7 @@
   "author": "@frubana",
   "license": "",
   "dependencies": {
-    "node-rdkafka": "2.7.0"
+    "node-rdkafka": "^2.7.1-2"
   },
   "devDependencies": {
     "@adonisjs/ace": "^4.0.8",
