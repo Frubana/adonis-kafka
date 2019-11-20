@@ -1,135 +1,95 @@
-const Kafka = require('node-rdkafka')
+/* eslint-disable global-require */
+/* eslint-disable import/no-dynamic-require */
+const { Kafka } = require("kafkajs");
 
 class Consumer {
-  constructor (Logger, config, Helpers) {
-    this.Logger = Logger
-    this.Helpers = Helpers
+  constructor(Logger, config, Helpers) {
+    this.Logger = Logger;
+    this.Helpers = Helpers;
+    this.config = config;
 
-    this.topics = []
-    this.events = {}
-    this.killContainer = false
-    this.timeout = null
-    this.consumer = null
+    this.topics = [];
+    this.events = {};
+    this.killContainer = false;
+    this.timeout = null;
+    this.consumer = null;
 
-    this.consumer = new Kafka.KafkaConsumer(config, {})
+    const kafka = new Kafka({
+      clientId: this.config.clientId,
+      brokers: this.config.address
+    });
+
+    this.consumer = kafka.consumer({ groupId: this.config.groupId });
   }
 
-  start () {
-    this.consumer.connect()
+  async start() {
+    await this.consumer.connect();
 
-    this.Logger.info('Connecting Kafka')
-
-    this.consumer
-      .on('ready', this.onReady.bind(this))
-      .on('data', this.onData.bind(this))
-      .on('event.error', this.onEventError.bind(this))
-      .on('disconnected', this.onDisconnected.bind(this))
+    await this.consumer.run({
+      autoCommit: this.config.autoCommit,
+      eachMessage: this.onData.bind(this)
+    });
   }
 
-  onReady () {
-    this.consumer.consume()
-    this.consumer.subscribe(this.topics)
+  async onData({ topic, partition, message }) {
+    const result = JSON.parse(message.value.toString());
 
-    this.Logger.info('listening kafka')
-  }
-
-  onDisconnected (error) {
-    this.Logger.error('disconnected on consumer', error)
-
-    this.Logger.info('trying to reconnect consumer')
-
-    this.consumer.consume()
-    this.consumer.subscribe(this.topics)
-  }
-
-  onData (data) {
-    const result = JSON.parse(data.value.toString())
-
-    const events = this.events[data.topic] || []
+    const events = this.events[topic] || [];
 
     events.forEach(callback =>
-      callback(result, this.consumer.commit.bind(this.consumer))
-    )
-  }
+      callback(result, async () => {
+        if (this.config.autoCommit) {
+          return;
+        }
 
-  onEventError (err) {
-    this.killContainer = true
-
-    this.timeout = setTimeout(() => {
-      if (this.killContainer) {
-        this.Logger.error('killing the container...')
-        process.exit(1)
-      }
-    }, 10000)
-
-    this.Logger.error('event error on consumer', err)
-  }
-
-  rebalance (err, assign) {
-    if (!this.consumer) {
-      return
-    }
-
-    if (err.code === Kafka.CODES.ERRORS.ERR__ASSIGN_PARTITIONS) {
-      this.consumer.assign(assign)
-      this.killContainer = false
-      clearTimeout(this.timeout)
-      this.Logger.info('assigned partitions')
-      return
-    }
-
-    if (err.code === Kafka.CODES.ERRORS.ERR__REVOKE_PARTITIONS) {
-      // Same as above
-      this.consumer.unassign()
-      return
-    }
-
-    this.Logger.error(err)
+        await this.consumer.commitOffsets([
+          { topic, partition, offset: message.offset }
+        ]);
+      })
+    );
   }
 
   //
 
-  on (topic, callback) {
-    const callbackFunction = this.validateCallback(callback)
+  async on(topic, callback) {
+    const callbackFunction = this.validateCallback(callback);
 
     if (!callbackFunction) {
-      throw new Error("We can'f found your controller")
+      throw new Error("We can'f found your controller");
     }
 
-    this.topics.push(topic)
+    this.topics.push(topic);
 
-    const events = this.events[topic] || []
-    events.push(callbackFunction)
-    this.events[topic] = events
+    const events = this.events[topic] || [];
+    events.push(callbackFunction);
+    this.events[topic] = events;
 
-    if (this.consumer.isConnected()) {
-      this.consumer.subscribe(this.topics)
-    }
+    await this.consumer.subscribe({ topic, fromBeginning: true });
   }
 
-  validateCallback (callback) {
+  validateCallback(callback) {
     // In this case the service is a function
-    if (typeof callback === 'function') {
-      return callback
+    if (typeof callback === "function") {
+      return callback;
     }
 
-    const splited = callback.split('.')
+    const splited = callback.split(".");
 
-    const model = splited[0]
-    const func = splited[1]
+    const model = splited[0];
+    const func = splited[1];
 
-    const root = this.Helpers.appRoot()
-    const route = `${root}/app/Controllers/Kafka/${model}`
+    const root = this.Helpers.appRoot();
+    const route = `${root}/app/Controllers/Kafka/${model}`;
 
-    const Module = require(route)
-    const controller = new Module()
+    const Module = require(route);
+    const controller = new Module();
 
-    if (typeof controller[func] === 'function') {
-      return controller[func].bind(controller)
+    if (typeof controller[func] === "function") {
+      return controller[func].bind(controller);
     }
 
-    return null
+    return null;
   }
 }
 
-module.exports = Consumer
+module.exports = Consumer;

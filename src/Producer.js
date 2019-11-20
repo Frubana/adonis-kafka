@@ -1,27 +1,34 @@
-const Kafka = require('node-rdkafka')
+const { Kafka } = require("kafkajs");
 
 class Producer {
-  constructor (Logger, config) {
-    this.Logger = Logger
-    this.producer = new Kafka.Producer(config, {})
+  constructor(Logger, config) {
+    this.Logger = Logger;
+    this.config = config;
+
+    const kafka = new Kafka({
+      clientId: this.config.clientId,
+      brokers: this.config.address
+    });
+
+    this.producer = kafka.producer();
   }
 
-  start () {
-    this.producer.connect()
+  async start() {
+    await this.producer.connect();
   }
 
-  send (topic, data) {
-    if (typeof data !== 'object') {
-      throw new Error('You need send a json object in data argument')
+  async send(topic, data) {
+    if (typeof data !== "object") {
+      throw new Error("You need send a json object in data argument");
     }
 
-    // eslint-disable-next-line new-cap
-    const buffer = new Buffer.from(JSON.stringify(data))
+    await this.producer.send({
+      topic: "test-topic",
+      messages: data
+    });
 
-    this.producer.produce(topic, null, buffer, null, Date.now(), null)
-
-    this.Logger.info('sent data to kafka.')
+    this.Logger.info("sent data to kafka.");
   }
 }
 
-module.exports = Producer
+module.exports = Producer;

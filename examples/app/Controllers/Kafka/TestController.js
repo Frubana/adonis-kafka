@@ -1,12 +1,12 @@
 /** @type {import('@adonisjs/framework/src/Logger')} */
-const Logger = use('Logger')
+const Logger = use("Logger");
 
 class TestController {
-  index (data, commit) {
-    Logger.info('kafka data', data)
+  index(data, commit) {
+    Logger.info("kafka data", data);
 
-    commit()
+    commit();
   }
 }
 
-module.exports = TestController
+module.exports = TestController;
