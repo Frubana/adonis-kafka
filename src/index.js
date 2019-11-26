@@ -17,7 +17,7 @@ class KafkaConsumer {
       throw new Error("You need define a group");
     }
 
-    if (url === null || url === undefined || url === "") {
+    if ((url === null || url === undefined || url === "") && (!urls)) {
       throw new Error("You need define a kafka url");
     }
 
