@@ -1,6 +1,6 @@
 {
   "name": "@frubana/adonis-kafka",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Kafka addon for AdonisJs",
   "main": "src/index.js",
   "git": "git@github.com:Frubana/adonis-kafka.git",
