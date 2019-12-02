@@ -70,7 +70,7 @@ class Consumer {
       events.push(callbackFunction);
       this.events[item] = events;
       this.topics.push(item);
-      await this.consumer.subscribe({ topic, fromBeginning: this.config.fromBeginning || true });
+      await this.consumer.subscribe({ topic: item, fromBeginning: this.config.fromBeginning || true });
     })
   }
 
