@@ -7,7 +7,6 @@ class Consumer {
     this.Logger = Logger;
     this.Helpers = Helpers;
     this.config = config;
-
     this.topics = [];
     this.events = {};
     this.killContainer = false;
@@ -53,18 +52,26 @@ class Consumer {
 
   async on(topic, callback) {
     const callbackFunction = this.validateCallback(callback);
+    let topicArray = topic;
+
+    if (typeof topic === 'string') {
+      topicArray = topic.split(',');
+    }
 
     if (!callbackFunction) {
       throw new Error("We can'f found your controller");
     }
 
-    this.topics.push(topic);
-
-    const events = this.events[topic] || [];
-    events.push(callbackFunction);
-    this.events[topic] = events;
-
-    await this.consumer.subscribe({ topic, fromBeginning: true });
+    topicArray.forEach(async (item) => {
+      if (!item) {
+        return;
+      }
+      const events = this.events[item] || [];
+      events.push(callbackFunction);
+      this.events[item] = events;
+      this.topics.push(item);
+      await this.consumer.subscribe({ topic, fromBeginning: this.config.fromBeginning || true });
+    })
   }
 
   validateCallback(callback) {
