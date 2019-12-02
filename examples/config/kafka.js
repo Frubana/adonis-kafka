@@ -10,5 +10,7 @@ module.exports = {
 
   port: Env.get("KAFKA_PORT", 9092),
 
-  urls: Env.get("KAFKA_URLS", null)
+  urls: Env.get("KAFKA_URLS", null),
+
+  fromBeginning: Env.get('FROM_BEGINNING', true)
 };

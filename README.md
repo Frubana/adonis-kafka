@@ -41,6 +41,13 @@ Kafka.on("topic_name", (data, commit) => {
   commit();
 });
 
+// Multiples topics with one controller.
+
+Kafka.on("topic_name_1,topic_name_2,topic_name_3", (data, commit) => {
+  commit();
+});
+
+
 // Controller function
 Kafka.on("topic_name", "TestController.index");
 ```
