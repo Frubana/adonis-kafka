@@ -25,27 +25,34 @@ class Consumer {
     await this.consumer.connect();
 
     await this.consumer.run({
+      partitionsConsumedConcurrently: this.config.partitionsConcurrently || 1,
       autoCommit: this.config.autoCommit,
-      eachMessage: this.onData.bind(this)
+      eachMessage: this.execute.bind(this)
     });
   }
 
-  async onData({ topic, partition, message }) {
+  async execute({ topic, partition, message }) {
     const result = JSON.parse(message.value.toString());
 
     const events = this.events[topic] || [];
 
-    events.forEach(callback =>
-      callback(result, async () => {
-        if (this.config.autoCommit) {
-          return;
-        }
+    const promises = events.map(callback => {
+      return new Promise(resolve => {
+        callback(result, async () => {
+          resolve();
 
-        await this.consumer.commitOffsets([
-          { topic, partition, offset: message.offset }
-        ]);
-      })
-    );
+          if (this.config.autoCommit) {
+            return;
+          }
+
+          await this.consumer.commitOffsets([
+            { topic, partition, offset: message.offset }
+          ]);
+        });
+      });
+    });
+
+    await Promise.all(promises);
   }
 
   //
@@ -54,15 +61,15 @@ class Consumer {
     const callbackFunction = this.validateCallback(callback);
     let topicArray = topic;
 
-    if (typeof topic === 'string') {
-      topicArray = topic.split(',');
+    if (typeof topic === "string") {
+      topicArray = topic.split(",");
     }
 
     if (!callbackFunction) {
       throw new Error("We can'f found your controller");
     }
 
-    topicArray.forEach(async (item) => {
+    topicArray.forEach(async item => {
       if (!item) {
         return;
       }
@@ -70,8 +77,11 @@ class Consumer {
       events.push(callbackFunction);
       this.events[item] = events;
       this.topics.push(item);
-      await this.consumer.subscribe({ topic: item, fromBeginning: this.config.fromBeginning || true });
-    })
+      await this.consumer.subscribe({
+        topic: item,
+        fromBeginning: this.config.fromBeginning || true
+      });
+    });
   }
 
   validateCallback(callback) {

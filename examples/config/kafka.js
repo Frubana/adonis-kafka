@@ -12,5 +12,7 @@ module.exports = {
 
   urls: Env.get("KAFKA_URLS", null),
 
-  fromBeginning: Env.get('FROM_BEGINNING', true)
+  fromBeginning: Env.get("FROM_BEGINNING", true),
+
+  partitionsConcurrently: 1
 };
