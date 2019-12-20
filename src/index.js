@@ -17,11 +17,13 @@ class KafkaConsumer {
       throw new Error("You need define a group");
     }
 
-    if ((url === null || url === undefined || url === "") && (!urls)) {
+    if ((url === null || url === undefined || url === "") && !urls) {
       throw new Error("You need define a kafka url");
     }
 
-    const address = urls || [`${url}:${port}`];
+    const addresses = urls ? urls.split(",") : null;
+
+    const address = addresses || [`${url}:${port}`];
 
     this.config.address = address;
 
