@@ -23,7 +23,7 @@ class Producer {
     }
 
     await this.producer.send({
-      topic: "test-topic",
+      topic: topic,
       messages: data
     });
 
