@@ -7,7 +7,7 @@ class Producer {
 
     const kafka = new Kafka({
       clientId: this.config.clientId,
-      brokers: this.config.address
+      brokers: this.config.address,
     });
 
     this.producer = kafka.producer();
@@ -23,8 +23,8 @@ class Producer {
     }
 
     await this.producer.send({
-      topic: topic,
-      messages: data
+      topic,
+      messages: data,
     });
 
     this.Logger.info("sent data to kafka.");
