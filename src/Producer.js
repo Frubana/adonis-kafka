@@ -22,9 +22,24 @@ class Producer {
       throw new Error("You need send a json object in data argument");
     }
 
+    let messages = Array.isArray(data) ? data : [data];
+    messages = messages.map(message => {
+      if (!message.value) {
+        message = { 
+          value: JSON.stringify(message) 
+        }
+      }
+      
+      if (typeof message.value !== "string") {
+        message.value = JSON.stringify(message.value);
+      }
+
+      return message;
+    });
+
     await this.producer.send({
       topic,
-      messages: data,
+      messages,
     });
 
     this.Logger.info("sent data to kafka.");
