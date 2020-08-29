@@ -1,6 +1,6 @@
 {
   "name": "@frubana/adonis-kafka",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Kafka addon for AdonisJs",
   "main": "src/index.js",
   "git": "git@github.com:Frubana/adonis-kafka.git",
@@ -8,6 +8,9 @@
     "lint": "standard src/** providers/** --fix",
     "pretest": "npm run lint",
     "test": "./node_modules/.bin/japa"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "private": false,
   "keywords": [
