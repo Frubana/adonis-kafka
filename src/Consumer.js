@@ -46,7 +46,7 @@ class Consumer {
           }
 
           await this.consumer.commitOffsets([
-            { topic, partition, offset: message.offset }
+            { topic, partition, offset: message.offset + 1 }
           ]);
         });
       });
