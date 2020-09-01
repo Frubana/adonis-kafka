@@ -45,8 +45,10 @@ class Consumer {
             return;
           }
 
+          const offset = String(Number(message.offset) + 1)
+
           await this.consumer.commitOffsets([
-            { topic, partition, offset: message.offset + 1 }
+            { topic, partition, offset }
           ]);
         });
       });
