@@ -15,7 +15,9 @@ class Consumer {
 
     const kafka = new Kafka({
       clientId: this.config.clientId,
-      brokers: this.config.address
+      brokers: this.config.address,
+      connectionTimeout: this.config.connectionTimeout || 3000,
+      requestTimeout: this.config.requestTimeout || 60000
     });
 
     this.consumer = kafka.consumer({ groupId: this.config.groupId });
