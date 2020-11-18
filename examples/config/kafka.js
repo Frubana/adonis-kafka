@@ -14,5 +14,9 @@ module.exports = {
 
   fromBeginning: Env.get("FROM_BEGINNING", true),
 
-  partitionsConcurrently: 1
+  partitionsConcurrently: 1,
+
+  connectionTimeout: 3000,
+
+  requestTimeout: 60000
 };

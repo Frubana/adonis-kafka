@@ -8,6 +8,8 @@ class Producer {
     const kafka = new Kafka({
       clientId: this.config.clientId,
       brokers: this.config.address,
+      connectionTimeout: this.config.connectionTimeout || 3000,
+      requestTimeout: this.config.requestTimeout || 60000
     });
 
     this.producer = kafka.producer();
@@ -25,11 +27,11 @@ class Producer {
     let messages = Array.isArray(data) ? data : [data];
     messages = messages.map(message => {
       if (!message.value) {
-        message = { 
-          value: JSON.stringify(message) 
+        message = {
+          value: JSON.stringify(message)
         }
       }
-      
+
       if (typeof message.value !== "string") {
         message.value = JSON.stringify(message.value);
       }
